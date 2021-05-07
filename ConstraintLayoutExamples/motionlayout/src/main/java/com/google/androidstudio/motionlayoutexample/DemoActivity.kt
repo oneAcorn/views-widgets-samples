@@ -18,6 +18,8 @@ package com.google.androidstudio.motionlayoutexample
 
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
@@ -46,6 +48,40 @@ class DemoActivity : AppCompatActivity() {
             MotionLayout.DEBUG_SHOW_NONE
         }
         (container as? MotionLayout)?.setDebugMode(debugMode)
+
+        //test 无限循环
+        (container as? MotionLayout)?.run {
+            Handler().postDelayed({
+                transitionToEnd()
+                addTransitionListener(object : MotionLayout.TransitionListener {
+                    var mStartId = 0
+                    var mEndId = 0
+                    override fun onTransitionStarted(motionLayout: MotionLayout?, startId: Int, endId: Int) {
+                        Log.i("acorn", "onTransitionStarted,startId:${startId},endId:${endId}")
+                        mStartId = startId
+                        mEndId = endId
+                    }
+
+                    override fun onTransitionChange(motionLayout: MotionLayout?, startId: Int, endId: Int, progress: Float) {
+                        Log.i("acorn", "onTransitionChange,startId:${startId},endId:${endId},progress:$progress")
+                    }
+
+                    override fun onTransitionCompleted(p0: MotionLayout?, currentId: Int) {
+                        Log.i("acorn", "onTransitionCompleted,currentId:$currentId")
+                        if (currentId == mStartId) {
+                            transitionToEnd()
+                        } else if (currentId == mEndId) {
+                            transitionToStart()
+                        }
+                    }
+
+                    override fun onTransitionTrigger(p0: MotionLayout?, triggerId: Int, positive: Boolean, progress: Float) {
+                        Log.i("acorn", "onTransitionTrigger,triggerId:$triggerId,positive:$positive,progress:$progress")
+                    }
+
+                })
+            }, 1000)
+        }
     }
 
     fun changeState(v: View?) {

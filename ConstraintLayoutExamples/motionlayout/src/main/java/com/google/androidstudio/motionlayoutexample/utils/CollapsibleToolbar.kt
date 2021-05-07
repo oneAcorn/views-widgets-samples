@@ -31,6 +31,7 @@ class CollapsibleToolbar @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        //这里设置的监听
         (parent as? AppBarLayout)?.addOnOffsetChangedListener(this)
     }
 }
